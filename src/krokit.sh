@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PKGNAME=Krokit
-PKGVERSION=1.0
+PKGVERSION=1.0-a
 
 VERBOSE=0
 GROKPKGFILE=X
@@ -16,7 +16,7 @@ GROK_ETC=$GROKROOT/etc
 GROK_SRC=$GROKROOT/src
 GROK_DATA=$GROKROOT/data
 GROK_DIST=$GROKROOT/dist
-LOGSETTINGS=$GROK_DIST/doc/logging.properties
+LOGCONFIG=$GROK_ETC/logging.properties
 
 #------------------------------------------
 # Krokit utility functions
@@ -27,18 +27,24 @@ print_usage() {
 	Usage: krokit [options]... /path/to/project/source
 	Krokit makes it easy to setup OpenGrok source code search engine.
 
-	Initialize setup with '--init' option before deploying your projects.
-
-	Requirements: OpenGrok <= 1.5.12, OpenJRE-8 and Tomcat-9 servelet
-
 	Options:
 	    -a  --add    <project-path>     -- Generate index and add project to opengrok
 	    -d  --deploy <opengrok-package> -- Deploy Opengrok before adding projects
-	    -r  --delete <project-name>     -- Delete project from Opengrok indexing
+	    -D  --delete <project-name>     -- Delete project from Opengrok indexing
 	    -i  --init                      -- Initial setup to download and install dependencies
+	    -r  --refresh                   -- Refresh Opengrok indexer
 	    -V  --verbose                   -- Enable verbose mode
-	    -v  --version                   -- Print Krokit version
+	    -v  --version                   -- Print package version
 	    -h  --help                      -- Show this help menu
+
+	Demo:
+	    $ krokit --init                           # Initialize setup
+	    $ krokit --deploy opengrok-1.5.12.tar.gz  # Deploy Opengrok package
+	    $ krokit --add    <project-path>          # Added project to the webapp
+	    $ krokit --delete <project-name>          # Delete project from the webapp
+	    $ krokit --refresh                        # Refresh Opengrok index
+
+	  Visit $HOST_URL to explore the OpenGrok dashboard
 	USAGE
 
 	exit 1
@@ -121,13 +127,16 @@ krokit_generate_index() {
 	krokit_validate_groktools
 	krokit_validate_deployment
 
-	sudo opengrok-indexer -J=-Djava.util.logging.config.file=$LOGSETTINGS \
+	sudo opengrok-indexer -J=-Djava.util.logging.config.file=$LOGCONFIG \
 	                      -a $GROK_DIST/lib/opengrok.jar -- \
 	                      -c $CTAGS \
 	                      -s $GROK_SRC \
 	                      -d $GROK_DATA \
 	                      -W $GROK_ETC/configuration.xml \
-	                      -U $HOST_URL -H -P -S -G
+	                      -U $HOST_URL -H -P -S -G \
+	                      -i '*.out' -i '*.swo' -i '*.swp' \
+	                      -i '*.a' -i '*.d' -i '*.o' -i '*.so' -i '*.so.*' \
+	                      -i d:__ktags -i d:obj -i d:dist -i d:sandbox -i d:codereview -i d:'*-build'
 
 	if [ $? -ne 0 ]; then
 		echo -e "\n$PKGNAME: failed to deploy OpenGrok !!!\n"
@@ -196,6 +205,18 @@ krokit_delete_project() {
 	return $?
 }
 
+krokit_list_projects() {
+	echo "$PKGNAME: listing projects deployed at '$GROK_SRC'"
+	for ENTRY in $(ls -A "$GROK_SRC")
+	do
+		if [ -d $GROK_SRC/$ENTRY ]; then
+			echo "	$ENTRY"
+		else
+			echo "	FILE: $ENTRY"
+		fi
+	done
+}
+
 krokit_deploy_opengrok() {
 	if [ $# -lt 1 ]; then
 		echo -e "\n$PKGNAME: missing file operand (opengrok-package) !!!\n"
@@ -228,9 +249,24 @@ krokit_deploy_opengrok() {
 		exit 1
 	fi
 
-	sudo cp $LOGSETTINGS $GROK_ETC
+	cat <<-GROKLOGCONFIG > /tmp/opengrok-logger.cfg
+	handlers= java.util.logging.FileHandler, java.util.logging.ConsoleHandler
+
+	java.util.logging.FileHandler.pattern = /opengrok/log/opengrok%g.%u.log
+	java.util.logging.FileHandler.append = false
+	java.util.logging.FileHandler.limit = 0
+	java.util.logging.FileHandler.count = 30
+	java.util.logging.FileHandler.level = ALL
+	java.util.logging.FileHandler.formatter = org.opengrok.indexer.logger.formatter.SimpleFileLogFormatter
+
+	java.util.logging.ConsoleHandler.level = WARNING
+	java.util.logging.ConsoleHandler.formatter = org.opengrok.indexer.logger.formatter.SimpleFileLogFormatter
+
+	org.opengrok.level = FINE
+	GROKLOGCONFIG
+	sudo mv /tmp/opengrok-logger.cfg $LOGCONFIG
 	if [ $? -ne 0 ]; then
-		echo -e "\n$PKGNAME: failed to copy '$LOGSETTINGS' to '$GROK_ETC' !!!\n"
+		echo -e "\n$PKGNAME: failed to copy '$LOGCONFIG' to '$GROK_ETC' !!!\n"
 		exit 1
 	fi
 
@@ -278,6 +314,12 @@ krokit_worker() {
 		delete)
 			krokit_delete_project $@
 			;;
+		list)
+			krokit_list_projects
+			;;
+		refresh)
+			krokit_generate_index
+			;;
 		setup)
 			krokit_setup_opengrok
 			;;
@@ -287,7 +329,7 @@ krokit_worker() {
 }
 
 parse_cmdline_options() {
-	GETOPTS=$(getopt -o adhirvV --long add,deploy,delete,setup,help,verbose,version -- "$@")
+	GETOPTS=$(getopt -o adDhilrvV --long add,deploy,delete,init,help,list,refresh,verbose,version -- "$@")
 	if [ "$?" != "0" ]; then
 		echo "Try 'krokit --help' for more information."
 		exit 1
@@ -309,8 +351,16 @@ parse_cmdline_options() {
 				MODE=setup
 				shift
 				;;
-			-r | --delete)
+			-D | --delete)
 				MODE=delete
+				shift
+				;;
+			-l | --list)
+				MODE=list
+				shift
+				;;
+			-r | --refresh)
+				MODE=refresh
 				shift
 				;;
 			-V | --verbose)

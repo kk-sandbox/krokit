@@ -1,3 +1,15 @@
+krokit (1.0-a) stable; urgency=low
+
+  * Implemented 'list' option to list deployed projects
+  * Implemented 'refresh' option to refresh OpenGrok index
+  * Added ignore patterns to the indexer
+  * Updated OpenGrok logging properties
+  * Changed short option of delete to '-D'
+  * Updated Makefile to generate TARGET.out
+  * Added Usage demo in README and help menu
+
+ -- Kirubakaran Shanmugam <kribakarans@gmail.com>  Thu, 03 Nov 2022 14:25:25 +0530
+
 krokit (1.0-0) stable; urgency=low
 
   * Initial release.

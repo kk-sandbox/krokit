@@ -17,7 +17,8 @@ PKGBUILDDIR := $(BUILDDIR)/$(TARGET)-build
 all: sanity
 
 sanity:
-	bash -n $(SRCDIR)/krokit.sh
+	bash -n $(SRCDIR)/krokit.sh && \
+	$(INSTALL) -D $(SRCDIR)/krokit.sh ./$(TARGET).out
 
 install:
 	$(INSTALL) -D $(SRCDIR)/krokit.sh $(DESTDIR)$(BINDIR)/$(TARGET)
@@ -32,6 +33,7 @@ build:
 	@eval build/scripts/buildenv.sh
 
 clean:
+	rm -rf $(TARGET).out $(KTAGDIR)
 
 cfgclean distclean:
 	rm -rf $(PKGBUILDDIR) $(DISTDIR)/* $(KTAGDIR)

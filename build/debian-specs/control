@@ -10,4 +10,4 @@ Package: krokit
 Architecture: all
 Multi-Arch: foreign
 Depends: ${misc:Depends}
-Description: Source code tagging and navigation tool.
+Description: Tool to setup OpenGrok source code search engine.
