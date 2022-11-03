@@ -28,10 +28,11 @@ print_usage() {
 	Krokit makes it easy to setup OpenGrok source code search engine.
 
 	Options:
-	    -a  --add    <project-path>     -- Generate index and add project to opengrok
-	    -d  --deploy <opengrok-package> -- Deploy Opengrok before adding projects
+	    -a  --add    <project-path>     -- Generate index and add project to Opengrok
+	    -d  --deploy <opengrok-package> -- Deploy Opengrok webapp to explore source code
 	    -D  --delete <project-name>     -- Delete project from Opengrok indexing
 	    -i  --init                      -- Initial setup to download and install dependencies
+	    -l  --list                      -- List deployed projects in Opengrok
 	    -r  --refresh                   -- Refresh Opengrok indexer
 	    -V  --verbose                   -- Enable verbose mode
 	    -v  --version                   -- Print package version
@@ -41,6 +42,7 @@ print_usage() {
 	    $ krokit --init                           # Initialize setup
 	    $ krokit --deploy opengrok-1.5.12.tar.gz  # Deploy Opengrok package
 	    $ krokit --add    <project-path>          # Added project to the webapp
+	    $ krokit --list                           # List projects deployed in webapp
 	    $ krokit --delete <project-name>          # Delete project from the webapp
 	    $ krokit --refresh                        # Refresh Opengrok index
 
