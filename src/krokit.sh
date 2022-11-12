@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PKGNAME=Krokit
-PKGVERSION=1.0-a
+PKGVERSION=1.0-b
 
 VERBOSE=0
 GROKPKGFILE=X
@@ -261,7 +261,7 @@ krokit_deploy_opengrok() {
 	java.util.logging.FileHandler.level = ALL
 	java.util.logging.FileHandler.formatter = org.opengrok.indexer.logger.formatter.SimpleFileLogFormatter
 
-	java.util.logging.ConsoleHandler.level = WARNING
+	java.util.logging.ConsoleHandler.level = INFO
 	java.util.logging.ConsoleHandler.formatter = org.opengrok.indexer.logger.formatter.SimpleFileLogFormatter
 
 	org.opengrok.level = FINE

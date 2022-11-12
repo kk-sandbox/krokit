@@ -1,3 +1,9 @@
+krokit (1.0-b) stable; urgency=low
+
+  * Updated Java debug level to INFO
+
+ -- Kirubakaran Shanmugam <kribakarans@gmail.com>  Sat, 12 Nov 2022 15:36:55 +0530
+
 krokit (1.0-a) stable; urgency=low
 
   * Implemented 'list' option to list deployed projects
