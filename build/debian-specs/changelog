@@ -1,4 +1,4 @@
-krokit (1.0-d) stable; urgency=low
+krokit (1.0-c) stable; urgency=low
 
   * Deleting project will remove OpeGrok caches as well
   * Added OpenGrok download link in '--deploy' failure message
