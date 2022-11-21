@@ -3,7 +3,7 @@
 PACKAGE=Krokit
 ELFNAME=krokit
 RELEASE=1.0
-REVISION=b
+REVISION=c
 VERSION=${RELEASE}-${REVISION}
 HOMEPAGE=https://github.com/atomixcloud/krokit
 MAINTAINER="Kirubakaran Shanmugam <kribakarans@gmail.com>"

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PKGNAME=Krokit
-PKGVERSION=1.0-b
+PKGVERSION=1.0c
 
 VERBOSE=0
 GROKPKGFILE=X
@@ -178,6 +178,19 @@ krokit_add_project() {
 	return $?
 }
 
+
+krokit_remove_file() {
+	FILE=$1
+	echo "    Removing ... '$FILE'"
+	sudo rm -rf $FILE
+	if [ $? -ne 0 ]; then
+		echo -e "\n$PKGNAME: failed to delete '$FILE' !!!\n"
+		return 1
+	fi
+
+	return 0
+}
+
 krokit_delete_project() {
 	if [ $# -lt 1 ]; then
 		echo -e "\n$PKGNAME: missing file operand (project-name) !!!\n"
@@ -197,10 +210,12 @@ krokit_delete_project() {
 	fi
 
 	echo "$PKGNAME: Deleting project '$PROJECT' ..."
-	sudo rm -r $GROK_SRC/$PROJECT
-	if [ $? -ne 0 ]; then
-		echo -e "\n$PKGNAME: failed to delete '$PROJECT' !!!\n"
-	fi
+
+	GROK_FILES=( $GROK_SRC/$PROJECT $GROK_DATA/xref/$PROJECT $GROK_DATA/index/$PROJECT $GROK_DATA/historycache/$PROJECT )
+	for GROK_FILE in "${GROK_FILES[@]}"
+	do
+		krokit_remove_file $GROK_FILE
+	done
 
 	krokit_generate_index
 
@@ -221,7 +236,8 @@ krokit_list_projects() {
 
 krokit_deploy_opengrok() {
 	if [ $# -lt 1 ]; then
-		echo -e "\n$PKGNAME: missing file operand (opengrok-package) !!!\n"
+		echo -e "\n$PKGNAME: missing file operand (opengrok-package) !!!"
+		echo -e "  Get the package from 'https://github.com/oracle/opengrok/releases/download/1.5.12/opengrok-1.5.12.tar.gz'\n"
 		exit 1
 	elif [ $# -gt 1 ]; then
 		echo "$PKGNAME:  too many arguments !!!"

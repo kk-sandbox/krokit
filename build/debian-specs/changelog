@@ -1,3 +1,10 @@
+krokit (1.0-d) stable; urgency=low
+
+  * Deleting project will remove OpeGrok caches as well
+  * Added OpenGrok download link in '--deploy' failure message
+
+ -- Kirubakaran Shanmugam <kribakarans@gmail.com>  Tue, 22 Nov 2022 04:30:30 +0530
+
 krokit (1.0-b) stable; urgency=low
 
   * Updated Java debug level to INFO
