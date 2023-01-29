@@ -137,8 +137,8 @@ krokit_generate_index() {
 	                      -W $GROK_ETC/configuration.xml \
 	                      -U $HOST_URL -H -P -S -G \
 	                      -i '*.out' -i '*.swo' -i '*.swp' \
-	                      -i '*.a' -i '*.d' -i '*.o' -i '*.so' -i '*.so.*' \
-	                      -i d:__ktags -i d:obj -i d:dist -i d:sandbox -i d:codereview -i d:'*-build'
+	                      -i '*.a' -i '*.d' -i '*.o' -i '*.so' -i '*.so.*' -i d:'*-build' \
+	                      -i d:obj -i d:dist -i d:sandbox -i d:__codereview -i d:__html -i d:__ktags
 
 	if [ $? -ne 0 ]; then
 		echo -e "\n$PKGNAME: failed to deploy OpenGrok !!!\n"
